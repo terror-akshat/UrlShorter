@@ -8,7 +8,8 @@ import com.akshat.urlShortner.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.Date;
+import java.util.UUID;
 
 @Service
 public class UrlService {
@@ -24,22 +25,29 @@ public class UrlService {
     }
 
     public String longToShort(String longUrl) {
-        return "www.akshat." + longUrl.substring(longUrl.length() / 2);
+        String shortUrl;
+        do {
+            shortUrl = UUID.randomUUID().toString().substring(0, 8);
+        } while (urlRepository.existsById(shortUrl));
+        return shortUrl;
     }
 
     public Url createShortUrl(String longUrl, int id) {
         String shortUrl = longToShort(longUrl);
-        Optional<Url> user = Optional.of(urlRepository.findById(id).orElseThrow(() -> new RuntimeException("User not Found")));
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         Url url = new Url();
         url.setShortUrl(shortUrl);
         url.setLongUrl(longUrl);
-        url.setUserId(id);
-        urlRepository.save(url);
-        return url;
+        url.setCreatedTime(new Date());
+        url.setUser(user);
+        return urlRepository.save(url);
     }
 
     public String getOriginalUrl(String shortUrl) {
-        return String.valueOf(urlRepository.findByShortUrl(shortUrl).orElseThrow(() -> new RuntimeException("Url not found")));
+        return urlRepository.findByShortUrl(shortUrl)
+                .orElseThrow(() -> new RuntimeException("Url not found"))
+                .getLongUrl();
     }
 }

@@ -19,10 +19,10 @@ public class UrlController {
     @Autowired
     private UrlService urlService;
 
-    @PostMapping("/id/{Id}")
-    public ResponseEntity<@NonNull Object> createShortUrl(@RequestBody String longUrl, @PathVariable int id) {
+    @PostMapping("/user/{id}")
+    public ResponseEntity<@NonNull Object> createShortUrl(@RequestBody UrlRequest request, @PathVariable int id) {
         try {
-            Url url = urlService.createShortUrl(longUrl, id);
+            Url url = urlService.createShortUrl(request.longUrl(), id);
             if (url == null) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
@@ -34,8 +34,8 @@ public class UrlController {
     }
 
 
-    @GetMapping
-    public ResponseEntity<@NonNull Object> redirect(@RequestBody String shortUrl) {
+    @GetMapping("/{shortUrl}")
+    public ResponseEntity<@NonNull Object> redirect(@PathVariable String shortUrl) {
         try {
             String url = urlService.getOriginalUrl(shortUrl);
             if (url == null) {
@@ -49,5 +49,8 @@ public class UrlController {
             log.error("Exception is occur{}", String.valueOf(e));
             throw new RuntimeException(e);
         }
+    }
+
+    public record UrlRequest(String longUrl) {
     }
 }

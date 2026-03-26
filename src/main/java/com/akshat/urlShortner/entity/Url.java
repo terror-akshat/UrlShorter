@@ -1,12 +1,8 @@
 package com.akshat.urlShortner.entity;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
-import lombok.NonNull;
 import java.util.Date;
 
 
@@ -14,16 +10,18 @@ import java.util.Date;
 @Data
 public class Url {
 
-
-    @NonNull
-    private String longUrl;
     @Id
-    private String ShortUrl;
-    private Date Created_time;
-    private Date Expiration_time;
-    private int userId;
+    private String shortUrl;
 
-    public Url() {
+    @Column(nullable = false)
+    private String longUrl;
 
-    }
+    private Date createdTime;
+    private Date expirationTime;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    public Url() {}
 }
