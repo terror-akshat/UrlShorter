@@ -20,9 +20,13 @@ public class UrlService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private RedisService redisService;
+
     public User createUser(User user) {
         return userRepository.save(user);
     }
+
 
     public String longToShort(String longUrl) {
         String shortUrl;
@@ -46,8 +50,16 @@ public class UrlService {
     }
 
     public String getOriginalUrl(String shortUrl) {
-        return urlRepository.findByShortUrl(shortUrl)
-                .orElseThrow(() -> new RuntimeException("Url not found"))
-                .getLongUrl();
+        String longUrl = redisService.get(shortUrl);
+        if (longUrl.isEmpty()) {
+            String url = urlRepository.findByShortUrl(shortUrl)
+                    .orElseThrow(() -> new RuntimeException("Url not found"))
+                    .getLongUrl();
+            if (!url.isEmpty()) {
+                redisService.set(shortUrl, url, 3000L);
+                return url;
+            }
+        }
+        return longUrl;
     }
 }
