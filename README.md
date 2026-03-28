@@ -24,7 +24,7 @@ The application uses:
 - MySQL
 - Redis
 - Maven
-- H2 database for tests
+- MySQl for database
 
 ## Project Structure
 ```text
@@ -194,8 +194,8 @@ Current application properties:
 ```properties
 spring.application.name=urlShortner
 spring.datasource.url=jdbc:mysql://localhost:3306/urlShortner
-spring.datasource.username=root
-spring.datasource.password=root
+spring.datasource.username=<Your username>
+spring.datasource.password=<Your password>
 
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
