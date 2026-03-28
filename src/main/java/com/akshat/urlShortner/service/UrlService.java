@@ -1,16 +1,17 @@
 package com.akshat.urlShortner.service;
 
-
 import com.akshat.urlShortner.entity.Url;
 import com.akshat.urlShortner.entity.User;
 import com.akshat.urlShortner.repository.UrlRepository;
 import com.akshat.urlShortner.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class UrlService {
 
@@ -50,16 +51,21 @@ public class UrlService {
     }
 
     public String getOriginalUrl(String shortUrl) {
-        String longUrl = redisService.get(shortUrl);
-        if (longUrl.isEmpty()) {
-            String url = urlRepository.findByShortUrl(shortUrl)
-                    .orElseThrow(() -> new RuntimeException("Url not found"))
-                    .getLongUrl();
-            if (!url.isEmpty()) {
-                redisService.set(shortUrl, url, 3000L);
-                return url;
+        try {
+            String longUrl = redisService.get(shortUrl);
+            if (longUrl == null || longUrl.isBlank()) {
+                String url = urlRepository.findByShortUrl(shortUrl)
+                        .orElseThrow(() -> new RuntimeException("Url not found"))
+                        .getLongUrl();
+                if (url != null && !url.isBlank()) {
+                    redisService.set(shortUrl, url, 3000L);
+                    return url;
+                }
             }
+            return longUrl;
+        } catch (Exception e) {
+            log.error("Exception{}", String.valueOf(e));
+            throw new RuntimeException(e);
         }
-        return longUrl;
     }
 }

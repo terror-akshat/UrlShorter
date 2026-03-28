@@ -10,3 +10,8 @@ public class UrlShortnerApplication {
 	}
 
 }
+//
+//
+//
+//http_server_requests_seconds_count{error="none",exception="none",method="GET",outcome="REDIRECTION",status="302",uri="/url/{shortUrl}"} 2
+//http_server_requests_seconds_sum{error="none",exception="none",method="GET",outcome="REDIRECTION",status="302",uri="/url/{shortUrl}"} 1.0954827
